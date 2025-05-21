@@ -13,7 +13,6 @@ data class PlannedPaymentRule(
     val startDate: Instant?,
     val intervalN: Int?,
     val intervalType: IntervalType?,
-    val oneTime: Boolean,
 
     val type: TransactionType,
     val accountId: UUID,
@@ -31,7 +30,6 @@ data class PlannedPaymentRule(
         startDate = startDate,
         intervalN = intervalN,
         intervalType = intervalType,
-        oneTime = oneTime,
         type = type,
         accountId = accountId,
         amount = amount,

@@ -60,32 +60,8 @@ class PlannedPaymentsLogic @Inject constructor(
         }
     }
 
-    suspend fun oneTime(): List<PlannedPaymentRule> {
-        return plannedPaymentRuleDao.findAllByOneTime(oneTime = true).map { it.toLegacyDomain() }
-    }
-
-    suspend fun oneTimeIncome(): Double {
-        return oneTime()
-            .filter { it.type == TransactionType.INCOME }
-            .sumByDoublePlannedInBaseCurrency(
-                exchangeRatesLogic = exchangeRatesLogic,
-                settingsDao = settingsDao,
-                accountDao = accountDao
-            )
-    }
-
-    suspend fun oneTimeExpenses(): Double {
-        return oneTime()
-            .filter { it.type == TransactionType.EXPENSE }
-            .sumByDoublePlannedInBaseCurrency(
-                exchangeRatesLogic = exchangeRatesLogic,
-                settingsDao = settingsDao,
-                accountDao = accountDao
-            )
-    }
-
     suspend fun recurring(): List<PlannedPaymentRule> =
-        plannedPaymentRuleDao.findAllByOneTime(oneTime = false).map { it.toLegacyDomain() }
+        plannedPaymentRuleDao.findAll().map { it.toLegacyDomain() }
 
     suspend fun recurringIncome(): Double {
         return recurring()
@@ -122,10 +98,6 @@ class PlannedPaymentsLogic @Inject constructor(
             baseCurrency = baseCurrency,
             accounts = accounts,
         )
-
-        if (plannedPayment.oneTime) {
-            return amountBaseCurrency
-        }
 
         val intervalN = plannedPayment.intervalN ?: return amountBaseCurrency
         if (intervalN <= 0) {
@@ -187,11 +159,6 @@ class PlannedPaymentsLogic @Inject constructor(
                     transactionRepository.save(it)
                 }
             }
-
-            if (plannedPaymentRule != null && plannedPaymentRule.oneTime) {
-                // delete paid oneTime planned payment rules
-                plannedPaymentRuleWriter.deleteById(plannedPaymentRule.id)
-            }
         }
 
         onUpdateUI(paidTransaction)
@@ -218,11 +185,6 @@ class PlannedPaymentsLogic @Inject constructor(
                 transactionRepository.deleteById(paidTransaction.id)
             } else {
                 transactionRepository.save(paidTransaction)
-            }
-
-            if (plannedPaymentRule != null && plannedPaymentRule.oneTime) {
-                // delete paid oneTime planned payment rules
-                plannedPaymentRuleWriter.deleteById(plannedPaymentRule.id)
             }
         }
 
@@ -260,13 +222,6 @@ class PlannedPaymentsLogic @Inject constructor(
             } else {
                 paidTransactions.forEach { paidTransaction ->
                     transactionRepository.save(paidTransaction)
-                }
-            }
-
-            plannedPaymentRules.forEach { plannedPaymentRule ->
-                if (plannedPaymentRule != null && plannedPaymentRule.oneTime) {
-                    // delete paid oneTime planned payment rules
-                    plannedPaymentRuleWriter.deleteById(plannedPaymentRule.id)
                 }
             }
         }
@@ -312,13 +267,6 @@ class PlannedPaymentsLogic @Inject constructor(
                     paidTransaction.toDomain(transactionMapper)?.let {
                         transactionRepository.save(it)
                     }
-                }
-            }
-
-            plannedPaymentRules.forEach { plannedPaymentRule ->
-                if (plannedPaymentRule != null && plannedPaymentRule.oneTime) {
-                    // delete paid oneTime planned payment rules
-                    plannedPaymentRuleWriter.deleteById(plannedPaymentRule.id)
                 }
             }
         }

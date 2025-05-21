@@ -23,19 +23,7 @@ class PlannedPaymentsGenerator @Inject constructor(
             recurringRuleId = rule.id
         )
 
-        if (rule.oneTime) {
-            generateOneTime(rule)
-        } else {
-            generateRecurring(rule)
-        }
-    }
-
-    private suspend fun generateOneTime(rule: PlannedPaymentRule) {
-        val trns = transactionRepository.findAllByRecurringRuleId(recurringRuleId = rule.id)
-
-        if (trns.isEmpty()) {
-            generateTransaction(rule, rule.startDate!!)
-        }
+        generateRecurring(rule)
     }
 
     @Suppress("MagicNumber")

@@ -130,16 +130,14 @@ private fun BoxWithConstraintsScope.UI(
                     shouldFocusRecurring(
                         state.startDate,
                         state.intervalN,
-                        state.intervalType,
-                        state.oneTime
+                        state.intervalType
                     ) -> {
                         onEvent(
                             EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
                                 RecurringRuleModalData(
                                     initialStartDate = state.startDate,
                                     initialIntervalN = state.intervalN,
-                                    initialIntervalType = state.intervalType,
-                                    initialOneTime = state.oneTime
+                                    initialIntervalType = state.intervalType
                                 )
                             )
                         )
@@ -169,15 +167,13 @@ private fun BoxWithConstraintsScope.UI(
             startDate = state.startDate,
             intervalN = state.intervalN,
             intervalType = state.intervalType,
-            oneTime = state.oneTime,
             onShowRecurringRuleModal = {
                 onEvent(
                     EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
                         RecurringRuleModalData(
                             initialStartDate = state.startDate,
                             initialIntervalN = state.intervalN,
-                            initialIntervalType = state.intervalType,
-                            initialOneTime = state.oneTime
+                            initialIntervalType = state.intervalType
                         )
                     )
                 )
@@ -205,8 +201,7 @@ private fun BoxWithConstraintsScope.UI(
                         RecurringRuleModalData(
                             initialStartDate = state.startDate,
                             initialIntervalN = state.intervalN,
-                            initialIntervalType = state.intervalType,
-                            initialOneTime = state.oneTime
+                            initialIntervalType = state.intervalType
                         )
                     )
                 )
@@ -249,16 +244,14 @@ private fun BoxWithConstraintsScope.UI(
                 shouldFocusRecurring(
                     state.startDate,
                     state.intervalN,
-                    state.intervalType,
-                    state.oneTime
+                    state.intervalType
                 ) -> {
                     onEvent(
                         EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
                             RecurringRuleModalData(
                                 initialStartDate = state.startDate,
                                 initialIntervalN = state.intervalN,
-                                initialIntervalType = state.intervalType,
-                                initialOneTime = state.oneTime
+                                initialIntervalType = state.intervalType
                             )
                         )
                     )
@@ -303,8 +296,7 @@ private fun BoxWithConstraintsScope.UI(
                     RecurringRuleModalData(
                         initialStartDate = state.startDate,
                         initialIntervalN = state.intervalN,
-                        initialIntervalType = state.intervalType,
-                        initialOneTime = state.oneTime
+                        initialIntervalType = state.intervalType
                     )
                 )
             )
@@ -369,11 +361,10 @@ private fun BoxWithConstraintsScope.UI(
 
     RecurringRuleModal(
         modal = state.recurringRuleModalData,
-        onRuleChanged = { newStartDate, newOneTime, newIntervalN, newIntervalType ->
+        onRuleChanged = { newStartDate, newIntervalN, newIntervalType ->
             onEvent(
                 EditPlannedScreenEvent.OnRuleChanged(
                     newStartDate,
-                    newOneTime,
                     newIntervalN,
                     newIntervalType
                 )
@@ -408,14 +399,12 @@ private fun shouldFocusTitle(
 private fun shouldFocusRecurring(
     startDate: LocalDateTime?,
     intervalN: Int?,
-    intervalType: IntervalType?,
-    oneTime: Boolean,
+    intervalType: IntervalType?
 ): Boolean {
     return !hasRecurringRule(
         startDate = startDate,
         intervalN = intervalN,
-        intervalType = intervalType,
-        oneTime = oneTime
+        intervalType = intervalType
     )
 }
 
@@ -429,7 +418,6 @@ private fun Preview() {
         UI(
             screen = EditPlannedScreen(null, TransactionType.EXPENSE),
             EditPlannedScreenState(
-                oneTime = false,
                 startDate = null,
                 intervalN = null,
                 intervalType = null,

@@ -71,17 +71,10 @@ private fun BoxWithConstraintsScope.UI(
         currency = state.currency,
         categories = state.categories,
         accounts = state.accounts,
-        oneTime = state.oneTimePlannedPayment,
-        oneTimeIncome = state.oneTimeIncome,
-        oneTimeExpenses = state.oneTimeExpenses,
         recurring = state.recurringPlannedPayment,
         recurringIncome = state.recurringIncome,
         recurringExpenses = state.recurringExpenses,
-        oneTimeExpanded = state.isOneTimePaymentsExpanded,
         recurringExpanded = state.isRecurringPaymentsExpanded,
-        setOneTimeExpanded = {
-            onEvent(PlannedPaymentsScreenEvent.OnOneTimePaymentsExpanded(it))
-        },
         setRecurringExpanded = {
             onEvent(PlannedPaymentsScreenEvent.OnRecurringPaymentsExpanded(it))
         },
@@ -129,21 +122,6 @@ private fun Preview() {
                 currency = "BGN",
                 accounts = persistentListOf(account),
                 categories = persistentListOf(food, shisha),
-                oneTimePlannedPayment = persistentListOf(
-                    PlannedPaymentRule(
-                        accountId = account.id,
-                        title = "Lidl pazar",
-                        categoryId = food.id.value,
-                        amount = 250.75,
-                        startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
-                        oneTime = true,
-                        intervalType = null,
-                        intervalN = null,
-                        type = TransactionType.EXPENSE
-                    )
-                ),
-                oneTimeExpenses = 250.75,
-                oneTimeIncome = 0.0,
                 recurringPlannedPayment = persistentListOf(
                     PlannedPaymentRule(
                         accountId = account.id,
@@ -151,7 +129,6 @@ private fun Preview() {
                         categoryId = shisha.id.value,
                         amount = 1025.5,
                         startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
-                        oneTime = false,
                         intervalType = IntervalType.MONTH,
                         intervalN = 1,
                         type = TransactionType.EXPENSE
@@ -159,7 +136,6 @@ private fun Preview() {
                 ),
                 recurringExpenses = 1025.5,
                 recurringIncome = 0.0,
-                isOneTimePaymentsExpanded = true,
                 isRecurringPaymentsExpanded = true
             )
         )

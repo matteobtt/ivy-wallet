@@ -44,15 +44,10 @@ fun PlannedPaymentsLazyColumn(
     currency: String,
     categories: ImmutableList<Category>,
     accounts: ImmutableList<Account>,
-    oneTime: ImmutableList<PlannedPaymentRule>,
-    oneTimeIncome: Double,
-    oneTimeExpenses: Double,
     recurring: ImmutableList<PlannedPaymentRule>,
     recurringIncome: Double,
     recurringExpenses: Double,
-    oneTimeExpanded: Boolean,
     recurringExpanded: Boolean,
-    setOneTimeExpanded: (Boolean) -> Unit,
     setRecurringExpanded: (Boolean) -> Unit,
     listState: LazyListState = rememberLazyListState(),
 ) {
@@ -76,12 +71,6 @@ fun PlannedPaymentsLazyColumn(
             accounts = accounts,
             listState = listState,
 
-            oneTime = oneTime,
-            oneTimeIncome = oneTimeIncome,
-            oneTimeExpenses = oneTimeExpenses,
-            oneTimeExpanded = oneTimeExpanded,
-            setOneTimeExpanded = setOneTimeExpanded,
-
             recurring = recurring,
             recurringIncome = recurringIncome,
             recurringExpenses = recurringExpenses,
@@ -99,49 +88,12 @@ private fun LazyListScope.plannedPaymentItems(
     accounts: ImmutableList<Account>,
     listState: LazyListState,
 
-    oneTime: ImmutableList<PlannedPaymentRule>,
-    oneTimeIncome: Double,
-    oneTimeExpenses: Double,
-    oneTimeExpanded: Boolean,
-    setOneTimeExpanded: (Boolean) -> Unit,
-
     recurring: ImmutableList<PlannedPaymentRule>,
     recurringIncome: Double,
     recurringExpenses: Double,
     recurringExpanded: Boolean,
     setRecurringExpanded: (Boolean) -> Unit,
 ) {
-    if (oneTime.isNotEmpty()) {
-        item {
-            SectionDivider(
-                expanded = oneTimeExpanded,
-                setExpanded = setOneTimeExpanded,
-                title = stringResource(R.string.one_time_payments),
-                titleColor = UI.colors.pureInverse,
-                baseCurrency = currency,
-                income = oneTimeIncome,
-                expenses = oneTimeExpenses.absoluteValue
-            )
-        }
-
-        if (oneTimeExpanded) {
-            itemsIndexed(oneTime) { _, item ->
-                PlannedPaymentCard(
-                    baseCurrency = currency,
-                    categories = categories,
-                    accounts = accounts,
-                    plannedPayment = item,
-                ) { plannedPaymentRule ->
-                    onPlannedPaymentClick(
-                        nav = nav,
-                        listState = listState,
-                        rule = plannedPaymentRule
-                    )
-                }
-            }
-        }
-    }
-
     if (recurring.isNotEmpty()) {
         item {
             SectionDivider(
@@ -173,7 +125,7 @@ private fun LazyListScope.plannedPaymentItems(
         }
     }
 
-    if (oneTime.isEmpty() && recurring.isEmpty()) {
+    if (recurring.isEmpty()) {
         item {
             NoPlannedPaymentsEmptyState()
         }

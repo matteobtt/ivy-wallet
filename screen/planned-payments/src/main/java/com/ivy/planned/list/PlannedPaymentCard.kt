@@ -40,7 +40,6 @@ import com.ivy.legacy.datamodel.PlannedPaymentRule
 import com.ivy.legacy.forDisplay
 import com.ivy.legacy.ui.component.transaction.TypeAmountCurrency
 import com.ivy.legacy.utils.formatDateOnly
-import com.ivy.legacy.utils.formatDateOnlyWithYear
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.legacy.utils.timeNowUTC
 import com.ivy.legacy.utils.uppercaseLocal
@@ -49,7 +48,6 @@ import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Blue
 import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Green
 import com.ivy.wallet.ui.theme.Orange
 import com.ivy.wallet.ui.theme.components.IvyButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
@@ -99,7 +97,6 @@ fun LazyItemScope.PlannedPaymentCard(
         Spacer(Modifier.height(16.dp))
 
         RuleTextRow(
-            oneTime = plannedPayment.oneTime,
             startDate = with(LocalTimeConverter.current) {
                 plannedPayment.startDate?.toLocalDateTime()
             },
@@ -213,7 +210,6 @@ private fun PlannedPaymentHeaderRow(
 
 @Composable
 private fun RuleTextRow(
-    oneTime: Boolean,
     startDate: LocalDateTime?,
     intervalN: Int?,
     intervalType: IntervalType?
@@ -224,86 +220,29 @@ private fun RuleTextRow(
     ) {
         Spacer(Modifier.width(24.dp))
 
-        if (oneTime) {
-            Text(
-                text = stringResource(R.string.planned_for_uppercase),
-                style = UI.typo.nC.style(
-                    color = Orange,
-                    fontWeight = FontWeight.SemiBold
-                )
+        val startDateFormatted = startDate?.toLocalDate()?.formatDateOnly()?.uppercaseLocal()
+        Text(
+            text = stringResource(R.string.starts_date, startDateFormatted ?: ""),
+            style = UI.typo.nC.style(
+                color = Orange,
+                fontWeight = FontWeight.SemiBold
             )
-            Text(
-                modifier = Modifier.padding(bottom = 1.dp),
-                text = startDate?.toLocalDate()?.formatDateOnlyWithYear()?.uppercaseLocal()
-                    ?: stringResource(R.string.null_text),
-                style = UI.typo.nC.style(
-                    color = Orange,
-                    fontWeight = FontWeight.ExtraBold
-                )
+        )
+        val intervalTypeFormatted = intervalType?.forDisplay(intervalN ?: 0)?.uppercaseLocal()
+        Text(
+            modifier = Modifier.padding(bottom = 1.dp),
+            text = stringResource(
+                R.string.repeats_every,
+                intervalN ?: 0,
+                intervalTypeFormatted ?: ""
+            ),
+            style = UI.typo.nC.style(
+                color = Orange,
+                fontWeight = FontWeight.ExtraBold
             )
-        } else {
-            val startDateFormatted = startDate?.toLocalDate()?.formatDateOnly()?.uppercaseLocal()
-            Text(
-                text = stringResource(R.string.starts_date, startDateFormatted ?: ""),
-                style = UI.typo.nC.style(
-                    color = Orange,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
-            val intervalTypeFormatted = intervalType?.forDisplay(intervalN ?: 0)?.uppercaseLocal()
-            Text(
-                modifier = Modifier.padding(bottom = 1.dp),
-                text = stringResource(
-                    R.string.repeats_every,
-                    intervalN ?: 0,
-                    intervalTypeFormatted ?: ""
-                ),
-                style = UI.typo.nC.style(
-                    color = Orange,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            )
-        }
+        )
 
         Spacer(Modifier.width(24.dp))
-    }
-}
-
-@Preview
-@Composable
-private fun Preview_oneTime() {
-    IvyWalletPreview {
-        LazyColumn(Modifier.fillMaxSize()) {
-            val cash = Account(name = "Cash", Green.toArgb())
-            val food = Category(
-                name = NotBlankTrimmedString.unsafe("Food"),
-                color = ColorInt(Blue.toArgb()),
-                icon = null,
-                id = CategoryId(UUID.randomUUID()),
-                orderNum = 0.0,
-            )
-
-            item {
-                Spacer(Modifier.height(68.dp))
-
-                PlannedPaymentCard(
-                    baseCurrency = "BGN",
-                    categories = persistentListOf(food),
-                    accounts = persistentListOf(cash),
-                    plannedPayment = PlannedPaymentRule(
-                        accountId = cash.id,
-                        title = "Lidl pazar",
-                        categoryId = food.id.value,
-                        amount = 250.75,
-                        startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
-                        oneTime = true,
-                        intervalType = null,
-                        intervalN = null,
-                        type = TransactionType.EXPENSE
-                    )
-                ) {}
-            }
-        }
     }
 }
 
@@ -334,7 +273,6 @@ private fun Preview_recurring() {
                         categoryId = shisha.id.value,
                         amount = 250.75,
                         startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
-                        oneTime = false,
                         intervalType = IntervalType.MONTH,
                         intervalN = 1,
                         type = TransactionType.EXPENSE
@@ -372,7 +310,6 @@ private fun Preview_recurringError() {
                         categoryId = shisha.id.value,
                         amount = 250.75,
                         startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
-                        oneTime = false,
                         intervalType = null,
                         intervalN = null,
                         type = TransactionType.EXPENSE

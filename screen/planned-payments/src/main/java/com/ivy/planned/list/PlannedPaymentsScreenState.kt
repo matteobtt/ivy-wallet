@@ -11,12 +11,8 @@ data class PlannedPaymentsScreenState(
     val currency: String,
     val categories: ImmutableList<Category>,
     val accounts: ImmutableList<Account>,
-    val oneTimePlannedPayment: ImmutableList<PlannedPaymentRule>,
-    val oneTimeIncome: Double,
-    val oneTimeExpenses: Double,
     val recurringPlannedPayment: ImmutableList<PlannedPaymentRule>,
     val recurringIncome: Double,
     val recurringExpenses: Double,
-    val isOneTimePaymentsExpanded: Boolean,
     val isRecurringPaymentsExpanded: Boolean
 )

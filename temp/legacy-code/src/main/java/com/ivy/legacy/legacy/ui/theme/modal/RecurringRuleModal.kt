@@ -67,7 +67,6 @@ data class RecurringRuleModalData(
     val initialStartDate: LocalDateTime?,
     val initialIntervalN: Int?,
     val initialIntervalType: IntervalType?,
-    val initialOneTime: Boolean = false,
     val id: UUID = UUID.randomUUID()
 )
 
@@ -76,17 +75,15 @@ data class RecurringRuleModalData(
 @Composable
 fun BoxWithConstraintsScope.RecurringRuleModal(
     modal: RecurringRuleModalData?,
-
     dismiss: () -> Unit,
-    onRuleChanged: (LocalDateTime, oneTime: Boolean, Int?, IntervalType?) -> Unit,
+    modifier: Modifier = Modifier,
+    onRuleChanged: (LocalDateTime, Int?, IntervalType?) -> Unit,
 ) {
     val timeProvider = LocalTimeProvider.current
     var startDate by remember(modal) {
         mutableStateOf(modal?.initialStartDate ?: timeProvider.localNow())
     }
-    var oneTime by remember(modal) {
-        mutableStateOf(modal?.initialOneTime ?: false)
-    }
+
     var intervalN by remember(modal) {
         mutableStateOf(modal?.initialIntervalN ?: 1)
     }
@@ -104,148 +101,47 @@ fun BoxWithConstraintsScope.RecurringRuleModal(
         PrimaryAction = {
             ModalSet(
                 modifier = Modifier.testTag("recurringModalSet"),
-                enabled = validate(oneTime, intervalN, intervalType)
+                enabled = validate(intervalN, intervalType)
             ) {
                 dismiss()
                 onRuleChanged(
                     startDate,
-                    oneTime,
                     intervalN,
                     intervalType
                 )
             }
         }
     ) {
-        Spacer(Modifier.height(32.dp))
-
         val rootView = LocalView.current
         onScreenStart {
             hideKeyboard(rootView)
         }
 
-        ModalTitle(text = stringResource(R.string.plan_for))
+        MultipleTimes(
+            startDate = startDate,
+            intervalN = intervalN,
+            intervalType = intervalType,
 
-        Spacer(Modifier.height(16.dp))
+            modalScrollState = modalScrollState,
 
-        // One-time & Multiple Times
-        TimesSelector(oneTime = oneTime) {
-            oneTime = it
-        }
-
-        if (oneTime) {
-            OneTime(
-                date = startDate,
-                onDatePicked = {
-                    startDate = it
-                }
-            )
-        } else {
-            MultipleTimes(
-                startDate = startDate,
-                intervalN = intervalN,
-                intervalType = intervalType,
-
-                modalScrollState = modalScrollState,
-
-                onSetStartDate = {
-                    startDate = it
-                },
-                onSetIntervalN = {
-                    intervalN = it
-                },
-                onSetIntervalType = {
-                    intervalType = it
-                }
-            )
-        }
+            onSetStartDate = {
+                startDate = it
+            },
+            onSetIntervalN = {
+                intervalN = it
+            },
+            onSetIntervalType = {
+                intervalType = it
+            }
+        )
     }
 }
 
 private fun validate(
-    oneTime: Boolean,
     intervalN: Int?,
     intervalType: IntervalType?
 ): Boolean {
-    return oneTime || intervalN != null && intervalN > 0 && intervalType != null
-}
-
-@Composable
-private fun TimesSelector(
-    oneTime: Boolean,
-
-    onSetOneTime: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .fillMaxWidth()
-            .background(UI.colors.medium, UI.shapes.r2),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(8.dp))
-
-        TimesSelectorButton(
-            selected = oneTime,
-            label = stringResource(R.string.one_time)
-        ) {
-            onSetOneTime(true)
-        }
-
-        Spacer(Modifier.width(8.dp))
-
-        TimesSelectorButton(
-            selected = !oneTime,
-            label = stringResource(R.string.multiple_times)
-        ) {
-            onSetOneTime(false)
-        }
-
-        Spacer(Modifier.width(8.dp))
-    }
-}
-
-@Composable
-private fun RowScope.TimesSelectorButton(
-    selected: Boolean,
-    label: String,
-    onClick: () -> Unit
-) {
-    val rFull = UI.shapes.rFull
-
-    Text(
-        modifier = Modifier
-            .weight(1f)
-            .clip(UI.shapes.rFull)
-            .clickable {
-                onClick()
-            }
-            .padding(vertical = 8.dp)
-            .thenIf(selected) {
-                background(GradientIvy.asHorizontalBrush(), rFull)
-            }
-            .padding(vertical = 8.dp),
-        text = label,
-        style = UI.typo.b2.style(
-            color = if (selected) White else Gray,
-            fontWeight = FontWeight.ExtraBold,
-            textAlign = TextAlign.Center
-        )
-    )
-}
-
-@Composable
-@Suppress("ParameterNaming")
-private fun OneTime(
-    date: LocalDateTime,
-    onDatePicked: (LocalDateTime) -> Unit
-) {
-    Spacer(Modifier.height(44.dp))
-
-    DateRow(dateTime = date) {
-        onDatePicked(it)
-    }
-
-    Spacer(Modifier.height(64.dp))
+    return intervalN != null && intervalN > 0 && intervalType != null
 }
 
 @Composable
@@ -260,66 +156,68 @@ private fun MultipleTimes(
     onSetIntervalN: (Int) -> Unit,
     onSetIntervalType: (IntervalType) -> Unit
 ) {
-    Spacer(Modifier.height(40.dp))
+    Column {
+        Spacer(Modifier.height(40.dp))
 
-    Text(
-        modifier = Modifier
-            .padding(start = 32.dp),
-        text = stringResource(R.string.starts_on),
-        style = UI.typo.b2.style(
-            color = UI.colors.pureInverse,
-            fontWeight = FontWeight.ExtraBold
+        Text(
+            modifier = Modifier
+                .padding(start = 32.dp),
+            text = stringResource(R.string.starts_on),
+            style = UI.typo.b2.style(
+                color = UI.colors.pureInverse,
+                fontWeight = FontWeight.ExtraBold
+            )
         )
-    )
 
-    Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-    DateRow(dateTime = startDate) {
-        onSetStartDate(it)
-    }
+        DateRow(dateTime = startDate) {
+            onSetStartDate(it)
+        }
 
-    Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(32.dp))
 
-    IvyDividerLine(
-        modifier = Modifier.padding(horizontal = 24.dp)
-    )
-
-    Spacer(Modifier.height(32.dp))
-
-    Text(
-        modifier = Modifier
-            .padding(start = 32.dp),
-        text = stringResource(R.string.repeats_every_text),
-        style = UI.typo.b2.style(
-            fontWeight = FontWeight.ExtraBold,
-            color = UI.colors.pureInverse
+        IvyDividerLine(
+            modifier = Modifier.padding(horizontal = 24.dp)
         )
-    )
 
-    Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(32.dp))
 
-    val rootView = LocalView.current
-    val coroutineScope = rememberCoroutineScope()
+        Text(
+            modifier = Modifier
+                .padding(start = 32.dp),
+            text = stringResource(R.string.repeats_every_text),
+            style = UI.typo.b2.style(
+                fontWeight = FontWeight.ExtraBold,
+                color = UI.colors.pureInverse
+            )
+        )
 
-    onScreenStart {
-        rootView.addKeyboardListener { keyboardShown ->
-            if (keyboardShown) {
-                coroutineScope.launch {
-                    delay(200)
-                    modalScrollState.animateScrollTo(modalScrollState.maxValue)
+        Spacer(Modifier.height(16.dp))
+
+        val rootView = LocalView.current
+        val coroutineScope = rememberCoroutineScope()
+
+        onScreenStart {
+            rootView.addKeyboardListener { keyboardShown ->
+                if (keyboardShown) {
+                    coroutineScope.launch {
+                        delay(200)
+                        modalScrollState.animateScrollTo(modalScrollState.maxValue)
+                    }
                 }
             }
         }
+
+        IntervalPickerRow(
+            intervalN = intervalN,
+            intervalType = intervalType,
+            onSetIntervalN = onSetIntervalN,
+            onSetIntervalType = onSetIntervalType
+        )
+
+        Spacer(Modifier.height(48.dp))
     }
-
-    IntervalPickerRow(
-        intervalN = intervalN,
-        intervalType = intervalType,
-        onSetIntervalN = onSetIntervalN,
-        onSetIntervalType = onSetIntervalType
-    )
-
-    Spacer(Modifier.height(48.dp))
 }
 
 @Composable
@@ -402,37 +300,17 @@ private fun IvyWalletCtx.pickDate(
 
 @Preview
 @Composable
-private fun Preview_oneTime() {
+private fun Preview() {
     IvyWalletPreview {
         BoxWithConstraints(Modifier.padding(bottom = 48.dp)) {
             RecurringRuleModal(
                 modal = RecurringRuleModalData(
                     initialStartDate = null,
                     initialIntervalN = null,
-                    initialIntervalType = null,
-                    initialOneTime = true
+                    initialIntervalType = null
                 ),
                 dismiss = {},
-                onRuleChanged = { _, _, _, _ -> }
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview_multipleTimes() {
-    IvyWalletPreview {
-        BoxWithConstraints(Modifier.padding(bottom = 48.dp)) {
-            RecurringRuleModal(
-                modal = RecurringRuleModalData(
-                    initialStartDate = null,
-                    initialIntervalN = null,
-                    initialIntervalType = null,
-                    initialOneTime = false
-                ),
-                dismiss = {},
-                onRuleChanged = { _, _, _, _ -> }
+                onRuleChanged = { _, _, _ -> }
             )
         }
     }
