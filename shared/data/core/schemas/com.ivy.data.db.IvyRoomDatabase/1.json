@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 130,
-    "identityHash": "8885cbdff164dda09da8b4a350e43740",
+    "version": 1,
+    "identityHash": "20ec2ff699c255ad5b217ed00e88ae2b",
     "entities": [
       {
         "tableName": "accounts",
@@ -308,7 +308,7 @@
       },
       {
         "tableName": "planned_payment_rules",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`startDate` INTEGER, `intervalN` INTEGER, `intervalType` TEXT, `oneTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, `amount` REAL NOT NULL, `categoryId` TEXT, `title` TEXT, `description` TEXT, `isSynced` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`startDate` INTEGER, `intervalN` INTEGER, `intervalType` TEXT, `type` TEXT NOT NULL, `accountId` TEXT NOT NULL, `amount` REAL NOT NULL, `categoryId` TEXT, `title` TEXT, `description` TEXT, `isSynced` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "startDate",
@@ -327,12 +327,6 @@
             "columnName": "intervalType",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "oneTime",
-            "columnName": "oneTime",
-            "affinity": "INTEGER",
-            "notNull": true
           },
           {
             "fieldPath": "type",
@@ -838,7 +832,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8885cbdff164dda09da8b4a350e43740')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '20ec2ff699c255ad5b217ed00e88ae2b')"
     ]
   }
 }
