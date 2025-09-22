@@ -36,15 +36,10 @@ class PlannedPaymentsViewModel @Inject constructor(
     private var currency by mutableStateOf("")
     private var categories by mutableStateOf<ImmutableList<Category>>(persistentListOf())
     private var accounts by mutableStateOf<ImmutableList<Account>>(persistentListOf())
-    private var oneTimePlannedPayment by
-        mutableStateOf<ImmutableList<PlannedPaymentRule>>(persistentListOf())
     private var recurringPlannedPayment by
         mutableStateOf<ImmutableList<PlannedPaymentRule>>(persistentListOf())
-    private var oneTimeIncome by mutableDoubleStateOf(0.0)
-    private var oneTimeExpenses by mutableDoubleStateOf(0.0)
     private var recurringIncome by mutableDoubleStateOf(0.0)
     private var recurringExpenses by mutableDoubleStateOf(0.0)
-    private var isOneTimePaymentsExpanded by mutableStateOf(true)
     private var isRecurringPaymentsExpanded by mutableStateOf(true)
 
     @Composable
@@ -57,13 +52,9 @@ class PlannedPaymentsViewModel @Inject constructor(
             currency = getCurrency(),
             categories = getCategories(),
             accounts = getAccounts(),
-            oneTimeIncome = getOneTimeIncome(),
-            oneTimeExpenses = getOneTimeExpenses(),
             recurringExpenses = getRecurringExpenses(),
             recurringIncome = getRecurringIncome(),
             recurringPlannedPayment = getRecurringPlannedPayment(),
-            oneTimePlannedPayment = getOneTimePlannedPayment(),
-            isOneTimePaymentsExpanded = getOneTimePaymentsExpanded(),
             isRecurringPaymentsExpanded = getRecurringPaymentsExpanded()
         )
     }
@@ -84,23 +75,8 @@ class PlannedPaymentsViewModel @Inject constructor(
     }
 
     @Composable
-    private fun getOneTimePlannedPayment(): ImmutableList<PlannedPaymentRule> {
-        return oneTimePlannedPayment
-    }
-
-    @Composable
     private fun getRecurringPlannedPayment(): ImmutableList<PlannedPaymentRule> {
         return recurringPlannedPayment
-    }
-
-    @Composable
-    private fun getOneTimeExpenses(): Double {
-        return oneTimeExpenses
-    }
-
-    @Composable
-    private fun getOneTimeIncome(): Double {
-        return oneTimeIncome
     }
 
     @Composable
@@ -118,16 +94,8 @@ class PlannedPaymentsViewModel @Inject constructor(
         return isRecurringPaymentsExpanded
     }
 
-    @Composable
-    private fun getOneTimePaymentsExpanded(): Boolean {
-        return isOneTimePaymentsExpanded
-    }
-
     override fun onEvent(event: PlannedPaymentsScreenEvent) {
         when (event) {
-            is PlannedPaymentsScreenEvent.OnOneTimePaymentsExpanded -> {
-                isOneTimePaymentsExpanded = event.isExpanded
-            }
             is PlannedPaymentsScreenEvent.OnRecurringPaymentsExpanded -> {
                 isRecurringPaymentsExpanded = event.isExpanded
             }
@@ -141,11 +109,6 @@ class PlannedPaymentsViewModel @Inject constructor(
 
             categories = categoriesRepository.findAll().toImmutableList()
             accounts = accountsAct(Unit)
-
-            oneTimePlannedPayment =
-                ioThread { plannedPaymentsLogic.oneTime() }.toImmutableList()
-            oneTimeIncome = ioThread { plannedPaymentsLogic.oneTimeIncome() }
-            oneTimeExpenses = ioThread { plannedPaymentsLogic.oneTimeExpenses() }
 
             recurringPlannedPayment =
                 ioThread { plannedPaymentsLogic.recurring() }.toImmutableList()

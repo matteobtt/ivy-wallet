@@ -63,7 +63,6 @@ class EditPlannedViewModel @Inject constructor(
     private var startDate by mutableStateOf<LocalDateTime?>(null)
     private var intervalN by mutableStateOf<Int?>(null)
     private var intervalType by mutableStateOf<IntervalType?>(null)
-    private var oneTime by mutableStateOf(false)
     private var initialTitle by mutableStateOf<String?>(null)
     private var description by mutableStateOf<String?>(null)
     private var account by mutableStateOf<Account?>(null)
@@ -94,7 +93,6 @@ class EditPlannedViewModel @Inject constructor(
             transactionType = getTransactionType(),
             startDate = getStartDate(),
             intervalN = getIntervalN(),
-            oneTime = getOneTime(),
             account = getAccount(),
             category = getCategory(),
             amount = getAmount(),
@@ -145,11 +143,6 @@ class EditPlannedViewModel @Inject constructor(
     @Composable
     private fun getIntervalType(): IntervalType? {
         return intervalType
-    }
-
-    @Composable
-    private fun getOneTime(): Boolean {
-        return oneTime
     }
 
     @Composable
@@ -233,7 +226,7 @@ class EditPlannedViewModel @Inject constructor(
             is EditPlannedScreenEvent.OnAmountChanged -> updateAmount(event.newAmount)
             is EditPlannedScreenEvent.OnTitleChanged -> updateTitle(event.newTitle)
             is EditPlannedScreenEvent.OnRuleChanged ->
-                updateRule(event.startDate, event.oneTime, event.intervalN, event.intervalType)
+                updateRule(event.startDate, event.intervalN, event.intervalType)
 
             is EditPlannedScreenEvent.OnCategoryChanged -> updateCategory(event.newCategory)
             is EditPlannedScreenEvent.OnEditCategory -> editCategory(event.updatedCategory)
@@ -284,7 +277,6 @@ class EditPlannedViewModel @Inject constructor(
                 startDate = null,
                 intervalN = null,
                 intervalType = null,
-                oneTime = false,
                 type = screen.type,
                 amount = screen.amount ?: 0.0,
                 accountId = screen.accountId ?: accounts.first().id,
@@ -303,7 +295,6 @@ class EditPlannedViewModel @Inject constructor(
         transactionType = rule.type
         startDate = with(timeConverter) { rule.startDate?.toLocalDateTime() }
         intervalN = rule.intervalN
-        oneTime = rule.oneTime
         intervalType = rule.intervalType
         initialTitle = rule.title
         description = rule.description
@@ -325,20 +316,17 @@ class EditPlannedViewModel @Inject constructor(
 
     private fun updateRule(
         startDate: LocalDateTime,
-        oneTime: Boolean,
         intervalN: Int?,
         intervalType: IntervalType?
     ) {
         loadedRule = loadedRule().copy(
             startDate = with(timeConverter) { startDate.toUTC() },
             intervalN = intervalN,
-            intervalType = intervalType,
-            oneTime = oneTime
+            intervalType = intervalType
         )
         this@EditPlannedViewModel.startDate = startDate
         this@EditPlannedViewModel.intervalN = intervalN
         this@EditPlannedViewModel.intervalType = intervalType
-        this@EditPlannedViewModel.oneTime = oneTime
 
         saveIfEditMode()
     }
@@ -452,11 +440,7 @@ class EditPlannedViewModel @Inject constructor(
             return false
         }
 
-        return if (oneTime) validateOneTime() else validateRecurring()
-    }
-
-    private fun validateOneTime(): Boolean {
-        return startDate != null
+        return validateRecurring()
     }
 
     private fun validateRecurring(): Boolean {

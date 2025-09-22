@@ -18,7 +18,6 @@ data class EditPlannedScreenState(
     val startDate: LocalDateTime?,
     val intervalN: Int?,
     val intervalType: IntervalType?,
-    val oneTime: Boolean,
     val initialTitle: String?,
     val description: String?,
     val categories: ImmutableList<Category>,

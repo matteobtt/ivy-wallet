@@ -24,8 +24,6 @@ data class PlannedPaymentRuleEntity(
     val intervalN: Int?,
     @SerialName("intervalType")
     val intervalType: IntervalType?,
-    @SerialName("oneTime")
-    val oneTime: Boolean,
     @SerialName("type")
     val type: TransactionType,
     @SerialName("accountId")

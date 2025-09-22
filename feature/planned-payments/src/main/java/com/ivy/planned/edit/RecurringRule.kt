@@ -37,22 +37,19 @@ fun RecurringRule(
     startDate: LocalDateTime?,
     intervalN: Int?,
     intervalType: IntervalType?,
-    oneTime: Boolean,
     onShowRecurringRuleModal: () -> Unit,
 ) {
     if (
         hasRecurringRule(
             startDate = startDate,
             intervalN = intervalN,
-            intervalType = intervalType,
-            oneTime = oneTime
+            intervalType = intervalType
         )
     ) {
         RecurringRuleCard(
             startDate = startDate!!,
             intervalN = intervalN,
             intervalType = intervalType,
-            oneTime = oneTime,
             onClick = {
                 onShowRecurringRuleModal()
             }
@@ -69,11 +66,10 @@ fun RecurringRule(
 fun hasRecurringRule(
     startDate: LocalDateTime?,
     intervalN: Int?,
-    intervalType: IntervalType?,
-    oneTime: Boolean,
+    intervalType: IntervalType?
 ): Boolean {
     return startDate != null &&
-        ((intervalN != null && intervalType != null) || oneTime)
+        ((intervalN != null && intervalType != null))
 }
 
 @Composable
@@ -81,7 +77,6 @@ private fun RecurringRuleCard(
     startDate: LocalDateTime,
     intervalN: Int?,
     intervalType: IntervalType?,
-    oneTime: Boolean,
     onClick: () -> Unit,
 ) {
     Row(
@@ -102,14 +97,14 @@ private fun RecurringRuleCard(
 
         Column {
             Text(
-                text = if (oneTime) stringResource(R.string.planned_for) else stringResource(R.string.planned_start_at),
+                text = stringResource(R.string.planned_start_at),
                 style = UI.typo.b2.style(
                     fontWeight = FontWeight.ExtraBold,
                     color = UI.colors.pureInverse
                 )
             )
 
-            if (!oneTime && intervalType != null && intervalN != null) {
+            if (intervalType != null && intervalN != null) {
                 Spacer(Modifier.height(4.dp))
 
                 val intervalTypeLabel = intervalType.forDisplay(intervalN).uppercaseLocal()
@@ -143,8 +138,7 @@ private fun Preview_Empty() {
         RecurringRule(
             startDate = null,
             intervalN = null,
-            intervalType = null,
-            oneTime = true
+            intervalType = null
         ) {
         }
     }
@@ -157,22 +151,7 @@ private fun Preview_Repeat() {
         RecurringRule(
             startDate = timeNowUTC(),
             intervalN = 1,
-            intervalType = IntervalType.MONTH,
-            oneTime = false
-        ) {
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview_OneTime() {
-    IvyWalletComponentPreview {
-        RecurringRule(
-            startDate = timeNowUTC().plusDays(5),
-            intervalN = null,
-            intervalType = null,
-            oneTime = true
+            intervalType = IntervalType.MONTH
         ) {
         }
     }

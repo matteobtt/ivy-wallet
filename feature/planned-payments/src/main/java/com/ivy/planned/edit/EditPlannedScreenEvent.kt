@@ -14,7 +14,6 @@ import java.time.LocalDateTime
 sealed interface EditPlannedScreenEvent {
     data class OnRuleChanged(
         val startDate: LocalDateTime,
-        val oneTime: Boolean,
         val intervalN: Int?,
         val intervalType: IntervalType?
     ) : EditPlannedScreenEvent

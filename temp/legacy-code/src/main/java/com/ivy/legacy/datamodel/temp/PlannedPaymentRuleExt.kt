@@ -7,7 +7,6 @@ fun PlannedPaymentRuleEntity.toLegacyDomain(): PlannedPaymentRule = PlannedPayme
     startDate = startDate,
     intervalN = intervalN,
     intervalType = intervalType,
-    oneTime = oneTime,
     type = type,
     accountId = accountId,
     amount = amount,
