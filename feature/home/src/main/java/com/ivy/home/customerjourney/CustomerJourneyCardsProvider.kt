@@ -135,21 +135,5 @@ class CustomerJourneyCardsProvider @Inject constructor(
         navigation.navigateTo(PieChartStatisticScreen(type = TransactionType.EXPENSE))
       }
     )
-
-    fun rateUsCard() = CustomerJourneyCardModel(
-      id = "rate_us",
-      condition = { trnCount, _, _, _ ->
-        trnCount >= 10
-      },
-      title = stringRes(R.string.review_ivy_wallet),
-      description = stringRes(R.string.review_ivy_wallet_description),
-      cta = stringRes(R.string.rate_us_on_google_play),
-      ctaIcon = R.drawable.ic_custom_star_s,
-      background = Gradient.solid(Green),
-      hasDismiss = true,
-      onAction = { _, _, ivyActivity ->
-        ivyActivity.reviewIvyWallet(dismissReviewCard = true)
-      }
-    )
   }
 }
